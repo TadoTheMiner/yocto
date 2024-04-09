@@ -1,7 +1,10 @@
-use ratatui::widgets::Paragraph;
+use ratatui::{
+    style::{Color, Style},
+    widgets::{Block, BorderType, Borders, Paragraph},
+};
 use Direction::*;
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct TextBuffer {
     text: Vec<String>,
     cursor: (u16, u16),
@@ -46,10 +49,6 @@ impl TextBuffer {
     }
     pub fn cursor_pos(&self) -> (u16, u16) {
         self.cursor
-    }
-
-    pub fn render(&self) -> Paragraph {
-        Paragraph::new(self.text.join("\n").to_string())
     }
 
     pub fn move_cursor(&mut self, direction: Direction) {
@@ -107,4 +106,31 @@ pub enum Direction {
     Right,
     Up,
     Down,
+}
+
+impl From<TextBuffer> for String {
+    fn from(val: TextBuffer) -> String {
+        val.text.join("\n")
+    }
+}
+
+const BLOCK: Block = Block::new()
+    .border_type(BorderType::Rounded)
+    .borders(Borders::ALL)
+    .border_style(Style::new().fg(Color::Rgb(180, 190, 254)));
+
+impl<'a> From<TextBuffer> for Paragraph<'a> {
+    fn from(val: TextBuffer) -> Self {
+        let text: String = val.into();
+        Paragraph::new(text).block(BLOCK)
+    }
+}
+
+impl From<String> for TextBuffer {
+    fn from(val: String) -> Self {
+        TextBuffer {
+            text: val.split('\n').map(String::from).collect(),
+            cursor: (0, 0),
+        }
+    }
 }

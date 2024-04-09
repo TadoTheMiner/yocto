@@ -1,6 +1,9 @@
 use crossterm::event::{self, Event, KeyCode};
 
-use crate::{text::Direction, SignalToApp, TextBuffer};
+use crate::{
+    app::SignalToApp,
+    text::{Direction, TextBuffer},
+};
 
 pub fn handle_keypress(buffer: &mut TextBuffer) -> Option<SignalToApp> {
     if let Ok(Event::Key(key)) = event::read() {

@@ -1,52 +1,27 @@
-mod key;
-pub mod text;
+use std::{
+    io::{stderr, Stderr},
+    panic,
+};
 
-use std::{error::Error, io::stderr, panic};
-
+use clap::{crate_authors, crate_description, crate_name, crate_version, Arg, Command};
 use crossterm::{
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
 
-use ratatui::{
-    prelude::{CrosstermBackend, Terminal},
-    widgets::{Block, BorderType, Borders},
-};
+use ratatui::prelude::{CrosstermBackend, Terminal};
 
-use text::TextBuffer;
-
-enum SignalToApp {
-    Exit,
-}
-
-const BLOCK: Block = Block::new()
-    .border_type(BorderType::Rounded)
-    .borders(Borders::ALL);
-
-fn main() -> Result<(), Box<dyn Error>> {
+use yocto::{app, Result};
+fn main() -> Result<()> {
     init_panic_handler();
-    // startup: Enable raw mode for the terminal, giving us fine control over user input
-    enable_raw_mode()?;
-    execute!(stderr(), EnterAlternateScreen)?;
+    let args = Command::new(crate_name!())
+        .author(crate_authors!())
+        .version(crate_version!())
+        .about(crate_description!())
+        .arg(Arg::new("FILE").help("File to edit"))
+        .get_matches();
 
-    // Initialize the terminal backend using crossterm
-    let mut terminal = Terminal::new(CrosstermBackend::new(std::io::stderr()))?;
-
-    let mut buffer = TextBuffer::default();
-    // Main application loop
-    loop {
-        // Render the UI
-        terminal.draw(|f| {
-            f.render_widget(buffer.render().block(BLOCK), f.size());
-        })?;
-        let cursor = buffer.cursor_pos();
-        terminal.set_cursor(cursor.0 + 1, cursor.1 + 1)?;
-        terminal.show_cursor()?;
-        if let Some(_signal) = key::handle_keypress(&mut buffer) {
-            break;
-        }
-    }
-
+    app::run(initialize_terminal()?, args.get_one::<String>("FILE"))?;
     clean_up()
 }
 
@@ -54,11 +29,20 @@ pub fn init_panic_handler() {
     let original_hook = panic::take_hook();
     panic::set_hook(Box::new(move |panic_info| {
         clean_up().unwrap();
-        original_hook(panic_info);
+        original_hook(panic_info)
     }));
 }
 
-fn clean_up() -> Result<(), Box<dyn Error>> {
+fn initialize_terminal() -> Result<Terminal<CrosstermBackend<Stderr>>> {
+    // startup: Enable raw mode for the terminal, giving us fine control over user input
+    enable_raw_mode()?;
+    execute!(stderr(), EnterAlternateScreen)?;
+
+    // Initialize the terminal backend using crossterm
+    Ok(Terminal::new(CrosstermBackend::new(std::io::stderr()))?)
+}
+
+fn clean_up() -> Result<()> {
     // shutdown down: reset terminal back to original state
     execute!(stderr(), LeaveAlternateScreen)?;
     disable_raw_mode()?;
