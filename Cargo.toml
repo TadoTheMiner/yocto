@@ -10,3 +10,7 @@ description = "A modern alternative to GNU nano"
 clap = { version = "4.5.4", features = ["cargo"] }
 crossterm = { version = "0.27.0", default-features = false, features = ["bracketed-paste", "events"]}
 ratatui = "0.25.0"
+
+[[bin]]
+name = "yocto"
+path = "src/main.rs"
