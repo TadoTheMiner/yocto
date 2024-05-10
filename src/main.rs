@@ -3,7 +3,7 @@ use std::{
     panic,
 };
 
-use clap::{crate_authors, crate_description, crate_name, crate_version, Arg, Command};
+use clap::{crate_authors, crate_description, crate_name, crate_version, Arg, ArgMatches, Command};
 use crossterm::{
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
@@ -11,18 +11,25 @@ use crossterm::{
 
 use ratatui::prelude::{CrosstermBackend, Terminal};
 
-use yocto::{app, Result};
+use yocto_editor::{app, Result};
 fn main() -> Result<()> {
     init_panic_handler();
-    let args = Command::new(crate_name!())
+    let result = run_app();
+    clean_up()?;
+    result
+}
+
+fn run_app() -> Result<()> {
+    app::run(initialize_terminal()?, cli().get_one::<String>("FILE"))
+}
+
+fn cli() -> ArgMatches {
+    Command::new(crate_name!())
         .author(crate_authors!())
         .version(crate_version!())
         .about(crate_description!())
         .arg(Arg::new("FILE").help("File to edit"))
-        .get_matches();
-
-    app::run(initialize_terminal()?, args.get_one::<String>("FILE"))?;
-    clean_up()
+        .get_matches()
 }
 
 pub fn init_panic_handler() {
