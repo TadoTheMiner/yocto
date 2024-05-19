@@ -1,7 +1,4 @@
-use ratatui::{
-    style::{Color, Style},
-    widgets::{Block, BorderType, Borders, Paragraph},
-};
+use ratatui::widgets::Paragraph;
 use Direction::*;
 
 #[derive(Default, Clone)]
@@ -21,7 +18,12 @@ impl TextBuffer {
             self.move_cursor(Direction::Up)
         }
     }
-
+    pub fn paragraph(&self) -> Paragraph {
+        Paragraph::new(self.to_string())
+    }
+    pub fn to_string(&self) -> String {
+        self.text.join("\n")
+    }
     pub fn enter(&mut self) {
         if (self.cursor.1 as usize) < self.text.len() {
             self.text.insert(self.cursor.1 as usize + 1, String::new());
@@ -106,24 +108,6 @@ pub enum Direction {
     Right,
     Up,
     Down,
-}
-
-impl From<TextBuffer> for String {
-    fn from(val: TextBuffer) -> String {
-        val.text.join("\n")
-    }
-}
-
-const BLOCK: Block = Block::new()
-    .border_type(BorderType::Rounded)
-    .borders(Borders::ALL)
-    .border_style(Style::new().fg(Color::Rgb(180, 190, 254)));
-
-impl<'a> From<TextBuffer> for Paragraph<'a> {
-    fn from(val: TextBuffer) -> Self {
-        let text: String = val.into();
-        Paragraph::new(text).block(BLOCK)
-    }
 }
 
 impl From<String> for TextBuffer {

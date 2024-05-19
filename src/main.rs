@@ -11,7 +11,7 @@ use crossterm::{
 
 use ratatui::prelude::{CrosstermBackend, Terminal};
 
-use yocto_editor::{app, Result};
+use yocto_editor::{app::App, Result};
 fn main() -> Result<()> {
     init_panic_handler();
     let result = run_app();
@@ -20,7 +20,7 @@ fn main() -> Result<()> {
 }
 
 fn run_app() -> Result<()> {
-    app::run(initialize_terminal()?, cli().get_one::<String>("FILE"))
+    App::new(initialize_terminal()?, cli().get_one::<String>("FILE"))?.run()
 }
 
 fn cli() -> ArgMatches {
