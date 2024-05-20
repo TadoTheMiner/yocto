@@ -1,11 +1,10 @@
-use std::{fs, io::Stderr};
-
 use self::{
     key::handle_keypress,
     text::{Direction, TextBuffer},
 };
-use crate::Result;
-use ratatui::{backend::CrosstermBackend, Terminal};
+use color_eyre::Result;
+use std::fs;
+use yocto_editor::Terminal;
 mod key;
 mod text;
 pub enum SignalToApp {
@@ -18,15 +17,12 @@ pub enum SignalToApp {
     End,
 }
 pub struct App<'a> {
-    terminal: Terminal<CrosstermBackend<Stderr>>,
+    terminal: Terminal,
     path: Option<&'a String>,
     buffer: TextBuffer,
 }
 impl<'a> App<'a> {
-    pub fn new(
-        terminal: Terminal<CrosstermBackend<Stderr>>,
-        path: Option<&'a String>,
-    ) -> Result<Self> {
+    pub fn new(terminal: Terminal, path: Option<&'a String>) -> Result<Self> {
         Ok(App {
             terminal,
             path,

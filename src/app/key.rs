@@ -1,5 +1,5 @@
 use super::{text::Direction, SignalToApp};
-use crate::Result;
+use color_eyre::Result;
 use crossterm::event::{self, Event, KeyCode::*};
 pub fn handle_keypress() -> Result<Option<SignalToApp>> {
     match event::read()? {

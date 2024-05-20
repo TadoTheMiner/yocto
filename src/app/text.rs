@@ -1,3 +1,6 @@
+use core::fmt;
+use std::fmt::{Display, Formatter};
+
 use ratatui::widgets::Paragraph;
 use Direction::*;
 
@@ -20,9 +23,6 @@ impl TextBuffer {
     }
     pub fn paragraph(&self) -> Paragraph {
         Paragraph::new(self.to_string())
-    }
-    pub fn to_string(&self) -> String {
-        self.text.join("\n")
     }
     pub fn enter(&mut self) {
         if (self.cursor.1 as usize) < self.text.len() {
@@ -116,5 +116,11 @@ impl From<String> for TextBuffer {
             text: val.split('\n').map(String::from).collect(),
             cursor: (0, 0),
         }
+    }
+}
+
+impl Display for TextBuffer {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}", self.text.join("\n"))
     }
 }
