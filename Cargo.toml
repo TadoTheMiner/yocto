@@ -15,3 +15,8 @@ ratatui = "0.25.0"
 [[bin]]
 name = "yocto"
 path = "src/main.rs"
+
+[dev-dependencies.cargo-husky]
+version = "1"
+default-features = false # Disable features which are enabled by default
+features = ["precommit-hook", "run-cargo-fmt", "run-cargo-clippy"]
