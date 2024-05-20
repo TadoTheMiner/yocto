@@ -1,4 +1,5 @@
-use std::error::Error;
+use std::{error::Error, io::Stderr};
 
-pub mod app;
+use ratatui::backend::CrosstermBackend;
 pub type Result<T> = std::result::Result<T, Box<dyn Error>>;
+pub type Terminal = ratatui::Terminal<CrosstermBackend<Stderr>>;
